@@ -1,14 +1,19 @@
 #!/bin/bash
 
-echo "Respaldando configuraciones..."
+LAB_DIR="/root/LABS/clab-ISA-NAT"
+DEST_DIR="configs"
 
-mkdir -p configs
+echo "Respaldando configuraciones de $LAB_DIR..."
+mkdir -p "$DEST_DIR"
 
-for r in /root/LABS/clab-ISA-NAT/SR*/tftpboot/config.txt
-do
-    router=$(basename $(dirname $(dirname "$r")))
-    cp "$r" "configs/${router}.cfg"
-    echo "Guardado: ${router}.cfg"
+# Busca config.cfg o config.txt sin requerir paréntesis
+find "$LAB_DIR" -type f -name "config.cfg" -o -type f -name "config.txt" | while read -r r; do
+    # Extrae el nombre del router (la carpeta inmediatamente después de clab-ISA-NAT/)
+    rel_path="${r#$LAB_DIR/}"
+    router="${rel_path%%/*}"
+
+    cp "$r" "$DEST_DIR/${router}.cfg"
+    echo "Guardado: $DEST_DIR/${router}.cfg (desde $r)"
 done
 
 echo ""
